@@ -3,11 +3,13 @@ import project  # on import will print something from __init__ file
 
 
 def setup_module(module):
-    print("basic setup module")
+    # print("basic setup module")
+    return
 
 
 def teardown_module(module):
-    print("basic teardown module")
+    # print("basic teardown module")
+    return
 
 
 def test_1():
