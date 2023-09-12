@@ -16,10 +16,11 @@ def get_graph_info(graph_name: str) -> GraphData:
 
 
 def get_labeled_two_cycles_graph(
-        first_cycle_nodes_num: int, second_cycle_nodes_num: int,
-        labels: Tuple[str, str]) -> nx.MultiDiGraph:
-    return cd.labeled_two_cycles_graph(first_cycle_nodes_num,
-                                       second_cycle_nodes_num, labels=labels)
+    first_cycle_nodes_num: int, second_cycle_nodes_num: int, labels: Tuple[str, str]
+) -> nx.MultiDiGraph:
+    return cd.labeled_two_cycles_graph(
+        first_cycle_nodes_num, second_cycle_nodes_num, labels=labels
+    )
 
 
 def save_graph_dot(graph: nx.MultiDiGraph, path: str) -> None:
