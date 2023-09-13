@@ -3,11 +3,12 @@ on: [ push, pull_request ]
 
 jobs:
   style:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
 
     strategy:
       matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
         python-version: [3.9]
 
     steps:
