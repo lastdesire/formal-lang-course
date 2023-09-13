@@ -35,7 +35,7 @@ def test_get_graph_info() -> None:
 
 
 def test_get_labeled_two_cycles_graph() -> None:
-    graph = cd.labeled_two_cycles_graph(5, 5, labels=("x", "y"))
+    graph = get_labeled_two_cycles_graph(5, 5, labels=("x", "y"))
     assert 12 == graph.number_of_edges()
     assert 11 == graph.number_of_nodes()
     assert {"x", "y"} == set(cd.get_sorted_labels(graph))
@@ -45,7 +45,7 @@ def test_save_graph_dot() -> None:
     # There is the path to expected graph from upper test.
     expected_graph_path = os.curdir + "/output/task_1/some_graph.dot"
     graph_path = os.curdir + "/output/task_1/some_other_graph.dot"
-    graph = get_labeled_two_cycles_graph(5, 5, labels=("x", "y"))
+    graph = cd.labeled_two_cycles_graph(5, 5, labels=("x", "y"))
     save_graph_dot(graph, graph_path)
     try:
         assert cmp(expected_graph_path, graph_path, shallow=False)
