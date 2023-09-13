@@ -43,8 +43,8 @@ def test_get_labeled_two_cycles_graph() -> None:
 
 def test_save_graph_dot() -> None:
     # There is the path to expected graph from upper test.
-    expected_graph_path = os.curdir + "/output/task_1/some_graph.dot"
-    graph_path = os.curdir + "/output/task_1/some_other_graph.dot"
+    expected_graph_path = os.curdir + "/tests/output/task_1/some_graph.dot"
+    graph_path = os.curdir + "/tests/output/task_1/some_other_graph.dot"
     graph = cd.labeled_two_cycles_graph(5, 5, labels=("x", "y"))
     utils.save_graph_dot(graph, graph_path)
     try:
