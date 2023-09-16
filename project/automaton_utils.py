@@ -1,13 +1,11 @@
-from typing import Set
-
+from typing import Set, Union
 from networkx import MultiDiGraph
+from pyformlang.regular_expression import Regex
 from pyformlang.finite_automaton import (
     EpsilonNFA as ENFA,
     DeterministicFiniteAutomaton as DFA,
     NondeterministicFiniteAutomaton as NFA,
 )
-from pyformlang.regular_expression import Regex
-from typing import Union
 
 
 def regex_to_min_dfa(r: Regex) -> DFA:
