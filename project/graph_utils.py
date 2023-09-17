@@ -25,3 +25,12 @@ def get_labeled_two_cycles_graph(
 
 def save_graph_dot(graph: nx.MultiDiGraph, path: str) -> None:
     nx.drawing.nx_pydot.write_dot(graph, path)
+
+
+def read_graph_dot(path: str) -> nx.MultiDiGraph:
+    graph = nx.drawing.nx_pydot.read_dot(path)
+    if "\n" in graph.nodes:
+        graph.remove_node("\n")
+    if "\\n" in graph.nodes:
+        graph.remove_node("\\n")
+    return graph
