@@ -3,10 +3,7 @@ import cfpq_data as cd
 import project.automaton_utils as utils
 import project.graph_utils as graph_utils
 from pyformlang.regular_expression import Regex
-from pyformlang.finite_automaton import (
-    DeterministicFiniteAutomaton as DFA,
-    State
-)
+from pyformlang.finite_automaton import DeterministicFiniteAutomaton as DFA, State
 
 
 def test_regex_to_min_dfa_1():
@@ -28,9 +25,12 @@ def test_regex_to_min_dfa_1():
     expected_dfa = DFA()
     expected_dfa.add_start_state(state0)
     expected_dfa.add_final_state(state1)
-    expected_dfa.add_transitions([(state0, "a", state1), (state0, "b", state1), (state0, "c", state1)])
-    
+    expected_dfa.add_transitions(
+        [(state0, "a", state1), (state0, "b", state1), (state0, "c", state1)]
+    )
+
     assert dfa.is_equivalent_to(dfa)
+
 
 def test_regex_to_min_dfa_2():
     r = Regex("(a+b+$)*c")
@@ -48,9 +48,12 @@ def test_regex_to_min_dfa_2():
     expected_dfa = DFA()
     expected_dfa.add_start_state(state0)
     expected_dfa.add_final_state(state1)
-    expected_dfa.add_transitions([(state0, "a", state0), (state0, "b", state0), (state0, "c", state1)])
+    expected_dfa.add_transitions(
+        [(state0, "a", state0), (state0, "b", state0), (state0, "c", state1)]
+    )
 
     assert dfa.is_equivalent_to(expected_dfa)
+
 
 def test_regex_to_min_dfa_3():
     r = Regex("$")
@@ -58,7 +61,7 @@ def test_regex_to_min_dfa_3():
 
     assert {} == dfa.to_dict()
     assert dfa.start_states == dfa.final_states
-    
+
     r_eq = Regex("$*")
     dfa_eq = utils.regex_to_min_dfa(r_eq)
 
@@ -68,7 +71,7 @@ def test_regex_to_min_dfa_3():
 def test_graph_to_nfa_1():
     graph = cd.graph_from_csv(cd.download("travel"))
     nfa = utils.graph_to_nfa(graph)
-    enfa = utils.graph_to_nfa(graph, is_epsilon_forbidden = False)
+    enfa = utils.graph_to_nfa(graph, is_epsilon_forbidden=False)
 
     assert nfa.is_equivalent_to(enfa)
     assert 131 == len(nfa.start_states)
@@ -78,6 +81,7 @@ def test_graph_to_nfa_1():
         for k in t.values():
             expected_edged_count += len(k)
     assert 277 == expected_edged_count
+
 
 def test_graph_to_nfa_2():
     graph = cd.graph_from_csv(cd.download("atom"))
@@ -91,6 +95,7 @@ def test_graph_to_nfa_2():
             expected_edged_count += len(k)
     assert 425 == expected_edged_count
 
+
 def test_graph_to_nfa_3():
     graph = graph_utils.get_labeled_two_cycles_graph(5, 100, labels=("x", "y"))
     nfa = utils.graph_to_nfa(graph, start_nodes={0})
@@ -103,8 +108,11 @@ def test_graph_to_nfa_3():
             expected_edged_count += len(k)
     assert 107 == expected_edged_count
 
+
 def test_graph_to_nfa_4():
-    graph = graph_utils.read_graph_dot(os.curdir + "/tests/output/task_1/some_graph.dot")
+    graph = graph_utils.read_graph_dot(
+        os.curdir + "/tests/output/task_1/some_graph.dot"
+    )
     nfa = utils.graph_to_nfa(graph)
 
     assert 11 == len(nfa.start_states)
