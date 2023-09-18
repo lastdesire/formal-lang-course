@@ -29,7 +29,7 @@ def test_regex_to_min_dfa_1():
         [(state0, "a", state1), (state0, "b", state1), (state0, "c", state1)]
     )
 
-    assert dfa.is_equivalent_to(dfa)
+    assert dfa.is_equivalent_to(expected_dfa)
 
 
 def test_regex_to_min_dfa_2():
