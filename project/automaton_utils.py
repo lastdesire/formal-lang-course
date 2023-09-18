@@ -9,7 +9,7 @@ from pyformlang.finite_automaton import (
 
 
 def regex_to_min_dfa(r: Regex) -> DFA:
-    return r.to_epsilon_nfa().to_deterministic().minimize()
+    return r.to_epsilon_nfa().minimize()
 
 
 def graph_to_nfa(
