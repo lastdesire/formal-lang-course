@@ -76,11 +76,11 @@ def test_graph_to_nfa_1():
     assert nfa.is_equivalent_to(enfa)
     assert 131 == len(nfa.start_states)
     assert 131 == len(nfa.final_states)
-    expected_edged_count = 0
-    for t in nfa.to_dict().values():
-        for k in t.values():
-            expected_edged_count += len(k)
-    assert 277 == expected_edged_count
+    expected_edges_count = 0
+    for target_node in nfa.to_dict().values():
+        for automaton_edge in target_node.values():
+            expected_edges_count += len(automaton_edge)
+    assert 277 == expected_edges_count
 
 
 def test_graph_to_nfa_2():
@@ -89,11 +89,11 @@ def test_graph_to_nfa_2():
 
     assert {0, 5, 10, 15} == nfa.start_states
     assert {4, 10, 16} == nfa.final_states
-    expected_edged_count = 0
-    for t in nfa.to_dict().values():
-        for k in t.values():
-            expected_edged_count += len(k)
-    assert 425 == expected_edged_count
+    expected_edges_count = 0
+    for target_node in nfa.to_dict().values():
+        for automaton_edge in target_node.values():
+            expected_edges_count += len(automaton_edge)
+    assert 425 == expected_edges_count
 
 
 def test_graph_to_nfa_3():
@@ -102,11 +102,11 @@ def test_graph_to_nfa_3():
 
     assert {0} == nfa.start_states
     assert 106 == len(nfa.final_states)
-    expected_edged_count = 0
-    for t in nfa.to_dict().values():
-        for k in t.values():
-            expected_edged_count += len(k)
-    assert 107 == expected_edged_count
+    expected_edges_count = 0
+    for target_node in nfa.to_dict().values():
+        for automaton_edge in target_node.values():
+            expected_edges_count += len(automaton_edge)
+    assert 107 == expected_edges_count
 
 
 def test_graph_to_nfa_4():
@@ -117,8 +117,8 @@ def test_graph_to_nfa_4():
 
     assert 11 == len(nfa.start_states)
     assert 11 == len(nfa.final_states)
-    expected_edged_count = 0
-    for t in nfa.to_dict().values():
-        for k in t.values():
-            expected_edged_count += len(k)
-    assert 12 == expected_edged_count
+    expected_edges_count = 0
+    for target_node in nfa.to_dict().values():
+        for automaton_edge in target_node.values():
+            expected_edges_count += len(automaton_edge)
+    assert 12 == expected_edges_count
