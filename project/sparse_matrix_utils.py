@@ -3,7 +3,14 @@ from pyformlang.finite_automaton import NondeterministicFiniteAutomaton as NFA, 
 from scipy.sparse import dok_matrix, kron
 
 SparseMatrix = namedtuple(
-    "SparseMatrix", [ "numerated_states", "inversed_numerated_states", "start_states", "final_states", "matrix" ]
+    "SparseMatrix",
+    [
+        "numerated_states",
+        "inversed_numerated_states",
+        "start_states",
+        "final_states",
+        "matrix",
+    ],
 )
 
 
@@ -28,9 +35,11 @@ def nfa_to_sparse_matrix(nfa: NFA) -> SparseMatrix:
                 states_to = transitions[symbol]
             if type(states_to) is State:
                 states_to = {states_to}
-    
+
             for state_to in states_to:
-                curr_symbol_matrix[ numerated_states[state_from], numerated_states[state_to] ] = True
+                curr_symbol_matrix[
+                    numerated_states[state_from], numerated_states[state_to]
+                ] = True
 
         matrix[symbol] = curr_symbol_matrix
 
@@ -63,7 +72,9 @@ def sparse_matrix_to_nfa(sparse_matrix: SparseMatrix) -> NFA:
     return nfa
 
 
-def intersect(sparse_matrix1: SparseMatrix, sparse_matrix2: SparseMatrix) -> SparseMatrix:
+def intersect(
+    sparse_matrix1: SparseMatrix, sparse_matrix2: SparseMatrix
+) -> SparseMatrix:
     symbols = sparse_matrix1.matrix.keys() & sparse_matrix2.matrix.keys()
 
     numerated_states = {}
@@ -76,15 +87,25 @@ def intersect(sparse_matrix1: SparseMatrix, sparse_matrix2: SparseMatrix) -> Spa
             state = len(sparse_matrix2.numerated_states) * state1_number + state2_number
             numerated_states[state] = state
 
-            if state1 in sparse_matrix1.start_states and state2 in sparse_matrix2.start_states:
+            if (
+                state1 in sparse_matrix1.start_states
+                and state2 in sparse_matrix2.start_states
+            ):
                 start_states.add(state)
 
-            if state1 in sparse_matrix1.final_states and state2 in sparse_matrix2.final_states:
+            if (
+                state1 in sparse_matrix1.final_states
+                and state2 in sparse_matrix2.final_states
+            ):
                 final_states.add(state)
 
     for symbol in symbols:
-        matrix[symbol] = kron(sparse_matrix1.matrix[symbol], sparse_matrix2.matrix[symbol], format="dok")
-    
+        matrix[symbol] = kron(
+            sparse_matrix1.matrix[symbol], sparse_matrix2.matrix[symbol], format="dok"
+        )
+
     inversed_numerated_states = numerated_states
 
-    return SparseMatrix(numerated_states, inversed_numerated_states, start_states, final_states, matrix)
+    return SparseMatrix(
+        numerated_states, inversed_numerated_states, start_states, final_states, matrix
+    )
