@@ -122,3 +122,48 @@ def test_graph_to_nfa_4():
         for automaton_edge in target_node.values():
             expected_edges_count += len(automaton_edge)
     assert 12 == expected_edges_count
+
+def test_rpq() -> None:
+    regex = Regex("(a+b)*b")
+    #   Equiv automaton for regex (0+1)*1.
+    #   |‾↓a  b    |‾↓b
+    # ->(0) ---> ((1))
+    #       <--- 
+    #        a  
+
+
+    state0 = State(5)
+    state1 = State(10)
+    state2 = State(15)
+    automaton1 = DFA()
+    #automaton1.add_start_state(state0)
+    #automaton1.add_final_state(state1)
+    #automaton1.add_final_state(state2)
+    automaton1.add_transitions(
+        [
+            (state0, "a", state0),
+            (state0, "b", state1),
+            (state1, "a", state0),
+            (state1, "b", state1),
+            (state0, "c", state2),
+            (state1, "c", state2),
+            (state2, "b", state2),
+            (state2, "a", state2),
+            (state2, "c", state2),
+        ]
+    )
+    #   Automaton #2.
+    #   |‾↓a  b    |‾↓b
+    # ->(0) ---> ((1))
+    #    |  <---   |
+    #  c |    a    | c
+    #    |___   ___|
+    #       ↓   ↓
+    #       ((2))
+
+    graph = automaton1.to_networkx()
+    res = (utils.rpq(graph, regex, {state0}, {state1, state2}))
+    expected_rpq_result = {(5, 10)}
+    expected_rpq_result_reversed = {(10, 5)}
+
+    assert expected_rpq_result == res or expected_rpq_result_reversed == res
