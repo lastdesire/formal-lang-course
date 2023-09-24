@@ -132,7 +132,7 @@ def test_intersect_with_empty_automaton() -> None:
     assert automaton1.is_equivalent_to(automaton_trans)
 
 
-def test_intersect_with_empty_automaten() -> None:
+def test_intersect_with_two_empty_automaton() -> None:
     automaton = DFA()
     automaton1 = DFA()
     automaton_trans = sparse_matrix_utils.sparse_matrix_to_nfa(
