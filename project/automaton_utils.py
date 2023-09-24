@@ -42,12 +42,23 @@ def graph_to_nfa(
     return automaton
 
 
-def rpq(graph: MultiDiGraph, regex: Regex, start_states: set = None, final_states: set = None) -> set:
+def rpq(
+    graph: MultiDiGraph,
+    regex: Regex,
+    start_states: set = None,
+    final_states: set = None,
+) -> set:
     rpq = set()
-    matrix_from_graph = sparse_matrix_utils.nfa_to_sparse_matrix(graph_to_nfa(graph, start_states, final_states))
-    matrix_from_regex = sparse_matrix_utils.nfa_to_sparse_matrix(regex_to_min_dfa(regex))
+    matrix_from_graph = sparse_matrix_utils.nfa_to_sparse_matrix(
+        graph_to_nfa(graph, start_states, final_states)
+    )
+    matrix_from_regex = sparse_matrix_utils.nfa_to_sparse_matrix(
+        regex_to_min_dfa(regex)
+    )
     matrix_from_regex_states_count = len(matrix_from_regex.numerated_states)
-    intersection_matrix = sparse_matrix_utils.intersect(matrix_from_graph, matrix_from_regex)
+    intersection_matrix = sparse_matrix_utils.intersect(
+        matrix_from_graph, matrix_from_regex
+    )
     print(intersection_matrix)
     if not intersection_matrix.matrix.values():
         matrix = dok_matrix((1, 1))
@@ -62,12 +73,25 @@ def rpq(graph: MultiDiGraph, regex: Regex, start_states: set = None, final_state
             curr_nonzeros = matrix.count_nonzero()
 
     for state_from, state_to in zip(*matrix.nonzero()):
-        if (state_from in intersection_matrix.start_states and state_to in intersection_matrix.final_states):
-            rpq.add((state_from // matrix_from_regex_states_count, state_to // matrix_from_regex_states_count))
+        if (
+            state_from in intersection_matrix.start_states
+            and state_to in intersection_matrix.final_states
+        ):
+            rpq.add(
+                (
+                    state_from // matrix_from_regex_states_count,
+                    state_to // matrix_from_regex_states_count,
+                )
+            )
             print(state_from, state_to)
 
     rpq_result = set()
     for state1, state2 in rpq:
-        rpq_result.add((matrix_from_graph.inversed_numerated_states[state1], matrix_from_graph.inversed_numerated_states[state2]))
+        rpq_result.add(
+            (
+                matrix_from_graph.inversed_numerated_states[state1],
+                matrix_from_graph.inversed_numerated_states[state2],
+            )
+        )
 
     return rpq_result
