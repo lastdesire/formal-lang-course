@@ -59,7 +59,7 @@ def rpq(
     intersection_matrix = sparse_matrix_utils.intersect(
         matrix_from_graph, matrix_from_regex
     )
-    print(intersection_matrix)
+
     if not intersection_matrix.matrix.values():
         matrix = dok_matrix((1, 1))
     else:
@@ -83,7 +83,6 @@ def rpq(
                     state_to // matrix_from_regex_states_count,
                 )
             )
-            print(state_from, state_to)
 
     rpq_result = set()
     for state1, state2 in rpq:
