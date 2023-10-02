@@ -172,7 +172,9 @@ def bfs(
         front = create_front(graph_smatrix, regex_smatrix, numerated_start_states)
 
     direct_sum = dict()
-    for i in set(graph_smatrix.matrix.keys()).intersection(set(regex_smatrix.matrix.keys())):
+    for i in set(graph_smatrix.matrix.keys()).intersection(
+        set(regex_smatrix.matrix.keys())
+    ):
         direct_sum[i] = dok_matrix(
             block_diag((regex_smatrix.matrix[i], graph_smatrix.matrix[i]))
         )
