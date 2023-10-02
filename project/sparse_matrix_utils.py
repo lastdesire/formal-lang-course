@@ -1,6 +1,8 @@
 from collections import namedtuple
 from pyformlang.finite_automaton import NondeterministicFiniteAutomaton as NFA, State
-from scipy.sparse import dok_matrix, kron
+from scipy.sparse import block_diag, dok_matrix, kron, vstack
+from typing import Dict
+
 
 SparseMatrix = namedtuple(
     "SparseMatrix",
@@ -109,3 +111,64 @@ def intersect(
     return SparseMatrix(
         numerated_states, inversed_numerated_states, start_states, final_states, matrix
     )
+
+
+def create_front(graph_smatrix: SparseMatrix, regex_smatrix: SparseMatrix, numerated_start_states: Dict) -> dok_matrix:
+    front_row = dok_matrix((1, len(graph_smatrix.numerated_states)), dtype=bool)
+    front = dok_matrix((len(regex_smatrix.numerated_states), len(graph_smatrix.numerated_states) + len(regex_smatrix.numerated_states)), dtype=bool)
+    for i in numerated_start_states:
+        front_row[0, i] = True
+    for i in regex_smatrix.start_states:
+        front[regex_smatrix.numerated_states[i], regex_smatrix.numerated_states[i]] = True
+        front[regex_smatrix.numerated_states[i], len(regex_smatrix.numerated_states):] = front_row
+    return front
+
+
+def upd_front(regex_smatrix: SparseMatrix, front: dok_matrix) -> dok_matrix:
+    upd_front = dok_matrix(front.shape, dtype=bool)
+    states_count = len(regex_smatrix.numerated_states)
+    for i, j in zip(*front.nonzero()):
+        if j < states_count:
+            if front[i, states_count:].count_nonzero() > 0:
+                upd_front[(i // states_count * states_count) + j, j] = True
+                upd_front[(i // states_count * states_count) + j, states_count :] += front[i, states_count:]
+    return upd_front
+
+
+def bfs(graph_smatrix: SparseMatrix, regex_smatrix: SparseMatrix, foreach_start_node: bool = False) -> set:
+    if not graph_smatrix.start_states:
+        return set()
+    numerated_start_states = [graph_smatrix.numerated_states[s] for s in graph_smatrix.start_states]
+    if foreach_start_node:
+        front = vstack([create_front(graph_smatrix, regex_smatrix, {i}) for i in numerated_start_states])
+    else:
+        front = create_front(graph_smatrix, regex_smatrix, numerated_start_states)
+
+    direct_sum = dict()
+    labels = set(graph_smatrix.matrix.keys()).intersection(set(regex_smatrix.matrix.keys()))
+    for l in labels:
+        direct_sum[l] = dok_matrix(block_diag((regex_smatrix.matrix[l], graph_smatrix.matrix[l])))
+
+    attended = dok_matrix(front.shape, dtype=bool)
+    while True:
+        saved_attended = attended.copy()
+        for ds_matrix in direct_sum.values():
+            next_front = (attended @ ds_matrix if front is None else front @ ds_matrix)
+            attended += upd_front(regex_smatrix, next_front)
+        if saved_attended.count_nonzero() == attended.count_nonzero():
+            break
+        front = None
+
+    ans = set()
+    graph_states_keys = list(graph_smatrix.numerated_states.keys())
+    regex_states_keys = list(regex_smatrix.numerated_states.keys())
+    regex_states_count = len(regex_smatrix.numerated_states)
+    for i, j in zip(*attended.nonzero()):
+        if (regex_states_keys[i % regex_states_count] in regex_smatrix.final_states and regex_states_count <= j):
+            if graph_states_keys[j - regex_states_count] in graph_smatrix.final_states:
+                if foreach_start_node:
+                    ans.add((numerated_start_states[i // regex_states_count], j - regex_states_count))
+                else:
+                    ans.add(j - regex_states_count)
+    return ans
+
