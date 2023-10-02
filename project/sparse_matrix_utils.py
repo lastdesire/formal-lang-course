@@ -175,9 +175,9 @@ def bfs(
     labels = set(graph_smatrix.matrix.keys()).intersection(
         set(regex_smatrix.matrix.keys())
     )
-    for l in labels:
-        direct_sum[l] = dok_matrix(
-            block_diag((regex_smatrix.matrix[l], graph_smatrix.matrix[l]))
+    for label in labels:
+        direct_sum[label] = dok_matrix(
+            block_diag((regex_smatrix.matrix[label], graph_smatrix.matrix[label]))
         )
 
     attended = dok_matrix(front.shape, dtype=bool)
