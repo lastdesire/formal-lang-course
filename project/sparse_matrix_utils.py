@@ -129,12 +129,12 @@ def create_front(
     for i in numerated_start_states:
         front_row[0, i] = True
     for i in regex_smatrix.start_states:
-        front[
-            regex_smatrix.numerated_states[i], regex_smatrix.numerated_states[i]
-        ] = True
-        front[
-            regex_smatrix.numerated_states[i], len(regex_smatrix.numerated_states) :
-        ] = front_row
+        (
+            front[regex_smatrix.numerated_states[i], regex_smatrix.numerated_states[i]],
+            front[
+                regex_smatrix.numerated_states[i], len(regex_smatrix.numerated_states) :
+            ],
+        ) = (True, front_row)
     return front
 
 
@@ -142,12 +142,11 @@ def upd_front(regex_smatrix: SparseMatrix, front: dok_matrix) -> dok_matrix:
     upd_front = dok_matrix(front.shape, dtype=bool)
     states_count = len(regex_smatrix.numerated_states)
     for i, j in zip(*front.nonzero()):
-        if j < states_count:
-            if front[i, states_count:].count_nonzero() > 0:
-                upd_front[(i // states_count * states_count) + j, j] = True
-                upd_front[
-                    (i // states_count * states_count) + j, states_count:
-                ] += front[i, states_count:]
+        if j < states_count and front[i, states_count:].count_nonzero() > 0:
+            upd_front[(i // states_count * states_count) + j, j] = True
+            upd_front[(i // states_count * states_count) + j, states_count:] += front[
+                i, states_count:
+            ]
     return upd_front
 
 
