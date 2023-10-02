@@ -96,19 +96,25 @@ def rpq(
     return rpq_result
 
 
-def bfs_rpq(graph: MultiDiGraph, regex: Regex, start_states: set = None, final_states: set = None, foreach_start_node: bool = False) -> set:
-    if regex_to_min_dfa(regex).is_empty() or {} == sparse_matrix_utils.nfa_to_sparse_matrix(regex_to_min_dfa(regex)).matrix:
+def bfs_rpq(
+    graph: MultiDiGraph,
+    regex: Regex,
+    start_states: set = None,
+    final_states: set = None,
+    foreach_start_node: bool = False,
+) -> set:
+    if (
+        regex_to_min_dfa(regex).is_empty()
+        or {}
+        == sparse_matrix_utils.nfa_to_sparse_matrix(regex_to_min_dfa(regex)).matrix
+    ):
         if start_states:
             return start_states
         return graph.nodes
     return sparse_matrix_utils.bfs(
-        sparse_matrix_utils.nfa_to_sparse_matrix
-        (
+        sparse_matrix_utils.nfa_to_sparse_matrix(
             graph_to_nfa(graph, start_states, final_states)
-        ), 
-        sparse_matrix_utils.nfa_to_sparse_matrix
-        (
-            regex_to_min_dfa(regex)
-        ), 
-        foreach_start_node
+        ),
+        sparse_matrix_utils.nfa_to_sparse_matrix(regex_to_min_dfa(regex)),
+        foreach_start_node,
     )
