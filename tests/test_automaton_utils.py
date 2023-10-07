@@ -1,5 +1,6 @@
 import os
 import cfpq_data as cd
+import networkx as nx
 import project.automaton_utils as utils
 import project.graph_utils as graph_utils
 from pyformlang.regular_expression import Regex
@@ -167,3 +168,88 @@ def test_rpq() -> None:
     expected_rpq_result_reversed = {(10, 5)}
 
     assert expected_rpq_result == res or expected_rpq_result_reversed == res
+
+
+def test_bfs_rpq_1() -> None:
+    graph = graph_utils.get_labeled_two_cycles_graph(5, 5, labels=("x", "y"))
+    regex = Regex("x")
+    assert {0, 1, 2, 3, 4, 5} == utils.bfs_rpq(graph, regex)
+
+
+def test_bfs_rpq_2() -> None:
+    graph = graph_utils.get_labeled_two_cycles_graph(5, 5, labels=("x", "y"))
+    regex = Regex("(x)(y)")
+    assert {6} == utils.bfs_rpq(graph, regex)
+
+
+def test_bfs_rpq_3() -> None:
+    graph = nx.MultiDiGraph()
+    regex = Regex("q")
+    assert 0 == len(utils.bfs_rpq(graph, regex))
+
+
+def test_bfs_rpq_4() -> None:
+    graph = graph_utils.get_labeled_two_cycles_graph(5, 5, labels=("a", "b"))
+    regex = Regex("(a+b)*$")
+    assert 11 == len(utils.bfs_rpq(graph, regex))
+
+
+def test_bfs_rpq_5() -> None:
+    graph = graph_utils.get_labeled_two_cycles_graph(5, 5, labels=("a", "b"))
+    regex = Regex("")
+    regex1 = Regex("$")
+    assert 11 == len(utils.bfs_rpq(graph, regex)) and utils.bfs_rpq(
+        graph, regex
+    ) == utils.bfs_rpq(graph, regex1)
+
+
+def test_bfs_rpq_6() -> None:
+    graph = graph_utils.get_labeled_two_cycles_graph(5, 5, labels=("a", "b"))
+    regex = Regex("a")
+    assert {4} == utils.bfs_rpq(graph, regex, start_states={3}) and {
+        0
+    } == utils.bfs_rpq(graph, regex, start_states={5})
+
+
+def test_bfs_rpq_7() -> None:
+    graph = graph_utils.get_labeled_two_cycles_graph(5, 5, labels=("a", "b"))
+    regex = Regex("a*")
+    expected = {0, 1, 2, 3, 4, 5}
+    assert expected == utils.bfs_rpq(
+        graph, regex, start_states={3}
+    ) and expected == utils.bfs_rpq(graph, regex, start_states={0})
+    assert 0 == len(utils.bfs_rpq(graph, regex, start_states={8}))
+
+
+def test_bfs_rpq_8() -> None:
+    graph = graph_utils.get_labeled_two_cycles_graph(100, 100, labels=("g", "h"))
+    regex = Regex("g")
+    assert {(88, 89)} == utils.bfs_rpq(
+        graph, regex, start_states={88}, foreach_start_node=True
+    )
+
+
+def test_bfs_rpq_9() -> None:
+    graph = graph_utils.get_labeled_two_cycles_graph(50, 50, labels=("g", "h"))
+    regex = Regex("g+(h*)")
+    assert {(10, 11)} == utils.bfs_rpq(
+        graph, regex, start_states={10}, foreach_start_node=True
+    )
+    regex1 = Regex("(g*)+h")
+    assert {(10, x) for x in range(0, 51)} == (
+        utils.bfs_rpq(graph, regex1, start_states={10}, foreach_start_node=True)
+    )
+    assert {(10, 11)} == (
+        utils.bfs_rpq(
+            graph, regex1, start_states={10}, final_states={11}, foreach_start_node=True
+        )
+    )
+    assert {(x, 11) for x in range(0, 51)} == (
+        utils.bfs_rpq(graph, regex1, final_states={11}, foreach_start_node=True)
+    )
+
+
+def test_bfs_rpq_10() -> None:
+    graph = cd.graph_from_csv(cd.download("travel"))
+    regex = Regex("range")
+    assert 0 < len(utils.bfs_rpq(graph, regex, foreach_start_node=True))

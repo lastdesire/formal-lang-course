@@ -145,3 +145,4 @@ _minted-presentation/
 *.fls
 *.gz
 .DS_Store
+.vscode/settings.json
