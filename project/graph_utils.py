@@ -8,6 +8,7 @@ class GraphData:
         self.number_of_nodes = graph.number_of_nodes()
         self.number_of_edges = graph.number_of_edges()
         self.labels = set(cd.get_sorted_labels(graph))
+        self.sorted_labels_list = cd.get_sorted_labels(graph)
         return
 
 
