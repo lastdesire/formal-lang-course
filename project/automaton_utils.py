@@ -47,6 +47,7 @@ def rpq(
     regex: Regex,
     start_states: set = None,
     final_states: set = None,
+    foreach_start_node: bool = True,
     matrix_type: Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix] = dok_matrix,
 ) -> set:
     rpq = set()
