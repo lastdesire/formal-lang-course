@@ -103,12 +103,14 @@ def bfs_rpq(
     start_states: set = None,
     final_states: set = None,
     foreach_start_node: bool = False,
-    matrix_type: Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix] = dok_matrix
+    matrix_type: Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix] = dok_matrix,
 ) -> set:
     if (
         regex_to_min_dfa(regex).is_empty()
         or {}
-        == sparse_matrix_utils.nfa_to_sparse_matrix(regex_to_min_dfa(regex), matrix_type).matrix
+        == sparse_matrix_utils.nfa_to_sparse_matrix(
+            regex_to_min_dfa(regex), matrix_type
+        ).matrix
     ):
         if start_states:
             return start_states
@@ -118,5 +120,6 @@ def bfs_rpq(
             graph_to_nfa(graph, start_states, final_states), matrix_type
         ),
         sparse_matrix_utils.nfa_to_sparse_matrix(regex_to_min_dfa(regex), matrix_type),
-        foreach_start_node, matrix_type
+        foreach_start_node,
+        matrix_type,
     )
