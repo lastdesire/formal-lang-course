@@ -6,7 +6,7 @@ from pyformlang.finite_automaton import (
     NondeterministicFiniteAutomaton as NFA,
 )
 from typing import Set, Union
-from scipy.sparse import dok_matrix
+from scipy.sparse import dok_matrix, lil_matrix, csr_matrix, csc_matrix
 import project.sparse_matrix_utils as sparse_matrix_utils
 
 
@@ -47,21 +47,22 @@ def rpq(
     regex: Regex,
     start_states: set = None,
     final_states: set = None,
+    matrix_type: Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix] = dok_matrix,
 ) -> set:
     rpq = set()
     matrix_from_graph = sparse_matrix_utils.nfa_to_sparse_matrix(
-        graph_to_nfa(graph, start_states, final_states)
+        graph_to_nfa(graph, start_states, final_states), matrix_type
     )
     matrix_from_regex = sparse_matrix_utils.nfa_to_sparse_matrix(
-        regex_to_min_dfa(regex)
+        regex_to_min_dfa(regex), matrix_type
     )
     matrix_from_regex_states_count = len(matrix_from_regex.numerated_states)
     intersection_matrix = sparse_matrix_utils.intersect(
-        matrix_from_graph, matrix_from_regex
+        matrix_from_graph, matrix_from_regex, matrix_type
     )
 
     if not intersection_matrix.matrix.values():
-        matrix = dok_matrix((1, 1))
+        matrix = matrix_type((1, 1))
     else:
         matrix = sum(intersection_matrix.matrix.values())
         prev_nonzeros = matrix.count_nonzero()
@@ -102,19 +103,20 @@ def bfs_rpq(
     start_states: set = None,
     final_states: set = None,
     foreach_start_node: bool = False,
+    matrix_type: Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix] = dok_matrix
 ) -> set:
     if (
         regex_to_min_dfa(regex).is_empty()
         or {}
-        == sparse_matrix_utils.nfa_to_sparse_matrix(regex_to_min_dfa(regex)).matrix
+        == sparse_matrix_utils.nfa_to_sparse_matrix(regex_to_min_dfa(regex), matrix_type).matrix
     ):
         if start_states:
             return start_states
         return graph.nodes
     return sparse_matrix_utils.bfs(
         sparse_matrix_utils.nfa_to_sparse_matrix(
-            graph_to_nfa(graph, start_states, final_states)
+            graph_to_nfa(graph, start_states, final_states), matrix_type
         ),
-        sparse_matrix_utils.nfa_to_sparse_matrix(regex_to_min_dfa(regex)),
-        foreach_start_node,
+        sparse_matrix_utils.nfa_to_sparse_matrix(regex_to_min_dfa(regex), matrix_type),
+        foreach_start_node, matrix_type
     )
