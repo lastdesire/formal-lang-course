@@ -1,0 +1,9 @@
+S -> A C#CNF#1
+A -> a
+C#CNF#1 -> B C#CNF#2
+B -> b
+C#CNF#2 -> C C#CNF#3
+C -> c
+C#CNF#3 -> D E
+D -> d
+E -> e

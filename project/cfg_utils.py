@@ -23,7 +23,7 @@ def cfg_to_wcnf(cfg: Union[str, CFG], start: Union[str, None] = None) -> CFG:
     )
 
 
-def read_cfg(path: Path, start: str = "S") -> CFG:
+def read_cfg(path: Union[str, Path], start: str = "S") -> CFG:
     with open(path, "r") as file:
         data = file.read()
     return CFG.from_text(data, Variable(start))
