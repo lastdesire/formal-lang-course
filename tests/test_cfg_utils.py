@@ -6,7 +6,17 @@ from scripts import shared
 
 def test_cfg_utils_1() -> None:
     cfg = (
-        read_cfg(str(shared.ROOT) + os.sep + "tests" + os.sep + "output" + os.sep + "task_6" + os.sep + "cfg1.txt")
+        read_cfg(
+            str(shared.ROOT)
+            + os.sep
+            + "tests"
+            + os.sep
+            + "output"
+            + os.sep
+            + "task_6"
+            + os.sep
+            + "cfg1.txt"
+        )
         .eliminate_unit_productions()
         .remove_useless_symbols()
     )
@@ -15,7 +25,18 @@ def test_cfg_utils_1() -> None:
 
 def test_cfg_utils_2() -> None:
     cfg = (
-        read_cfg(str(shared.ROOT) + os.sep + "tests" + os.sep + "output" + os.sep + "task_6" + os.sep + "cfg2.txt", "S")
+        read_cfg(
+            str(shared.ROOT)
+            + os.sep
+            + "tests"
+            + os.sep
+            + "output"
+            + os.sep
+            + "task_6"
+            + os.sep
+            + "cfg2.txt",
+            "S",
+        )
         .eliminate_unit_productions()
         .remove_useless_symbols()
     )
@@ -29,7 +50,18 @@ def test_cfg_utils_2() -> None:
 
 def test_cfg_utils_3() -> None:
     cfg = (
-        read_cfg(str(shared.ROOT) + os.sep + "tests" + os.sep + "output" + os.sep + "task_6" + os.sep + "cfg3.txt", "A")
+        read_cfg(
+            str(shared.ROOT)
+            + os.sep
+            + "tests"
+            + os.sep
+            + "output"
+            + os.sep
+            + "task_6"
+            + os.sep
+            + "cfg3.txt",
+            "A",
+        )
         .eliminate_unit_productions()
         .remove_useless_symbols()
     )
@@ -38,13 +70,35 @@ def test_cfg_utils_3() -> None:
 
 def test_cfg_utils_4() -> None:
     cfg = (
-        read_cfg(str(shared.ROOT) + os.sep + "tests" + os.sep + "output" + os.sep + "task_6" + os.sep + "cfg4.txt", "S")
+        read_cfg(
+            str(shared.ROOT)
+            + os.sep
+            + "tests"
+            + os.sep
+            + "output"
+            + os.sep
+            + "task_6"
+            + os.sep
+            + "cfg4.txt",
+            "S",
+        )
         .eliminate_unit_productions()
         .remove_useless_symbols()
     )
 
     wcnf = (
-        read_cfg(str(shared.ROOT) + os.sep + "tests" + os.sep + "output" + os.sep + "task_6" + os.sep + "wcnf4.txt", "S")
+        read_cfg(
+            str(shared.ROOT)
+            + os.sep
+            + "tests"
+            + os.sep
+            + "output"
+            + os.sep
+            + "task_6"
+            + os.sep
+            + "wcnf4.txt",
+            "S",
+        )
         .eliminate_unit_productions()
         .remove_useless_symbols()
     )
@@ -53,15 +107,33 @@ def test_cfg_utils_4() -> None:
 
 def test_cfg_utils_5() -> None:
     cfg = (
-        read_cfg(str(shared.ROOT) + os.sep + "tests" + os.sep + "output" + os.sep + "task_6" + os.sep + "cfg5.txt", "S")
+        read_cfg(
+            str(shared.ROOT)
+            + os.sep
+            + "tests"
+            + os.sep
+            + "output"
+            + os.sep
+            + "task_6"
+            + os.sep
+            + "cfg5.txt",
+            "S",
+        )
         .eliminate_unit_productions()
         .remove_useless_symbols()
     )
     print(cfg_to_wcnf(cfg).productions, len(cfg_to_wcnf(cfg).productions))
-    wcnf = (
-        read_cfg(str(shared.ROOT) + os.sep + "tests" + os.sep + "output" + os.sep + "task_6" + os.sep + "wcnf5.txt",
-                 "S")
-        .eliminate_unit_productions()
-    )
+    wcnf = read_cfg(
+        str(shared.ROOT)
+        + os.sep
+        + "tests"
+        + os.sep
+        + "output"
+        + os.sep
+        + "task_6"
+        + os.sep
+        + "wcnf5.txt",
+        "S",
+    ).eliminate_unit_productions()
     print(set(wcnf.productions), len(set(wcnf.productions)))
     assert cfg_to_wcnf(cfg).productions == set(wcnf.productions)
