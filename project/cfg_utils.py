@@ -5,7 +5,7 @@ from typing import Union
 
 def cfg_to_wcnf(cfg: Union[str, CFG], start: Union[str, None] = None) -> CFG:
     if start is None:
-        start = 'S'
+        start = "S"
     if not isinstance(cfg, CFG):
         cfg = CFG.from_text(cfg, Variable(start))
     cfg_new = (
@@ -13,8 +13,14 @@ def cfg_to_wcnf(cfg: Union[str, CFG], start: Union[str, None] = None) -> CFG:
         .eliminate_unit_productions()
         .remove_useless_symbols()
     )
-    return CFG(start_symbol=cfg_new._start_symbol, productions=set(
-        cfg_new._decompose_productions(cfg_new._get_productions_with_only_single_terminals())))
+    return CFG(
+        start_symbol=cfg_new._start_symbol,
+        productions=set(
+            cfg_new._decompose_productions(
+                cfg_new._get_productions_with_only_single_terminals()
+            )
+        ),
+    )
 
 
 def read_cfg(path: Path, start: str = "S") -> CFG:
