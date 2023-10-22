@@ -1,8 +1,15 @@
 from collections import namedtuple
 from pyformlang.finite_automaton import NondeterministicFiniteAutomaton as NFA, State
-from scipy.sparse import block_diag, dok_matrix, kron, vstack
-from typing import Dict
-
+from scipy.sparse import (
+    block_diag,
+    dok_matrix,
+    kron,
+    vstack,
+    lil_matrix,
+    csr_matrix,
+    csc_matrix,
+)
+from typing import Dict, Union
 
 SparseMatrix = namedtuple(
     "SparseMatrix",
@@ -16,7 +23,10 @@ SparseMatrix = namedtuple(
 )
 
 
-def nfa_to_sparse_matrix(nfa: NFA) -> SparseMatrix:
+def nfa_to_sparse_matrix(
+    nfa: NFA,
+    matrix_type: Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix] = dok_matrix,
+) -> SparseMatrix:
     numerated_states = dict()
     inversed_numerated_states = dict()
     i = 0
@@ -29,7 +39,7 @@ def nfa_to_sparse_matrix(nfa: NFA) -> SparseMatrix:
     matrix = dict()
 
     for symbol in nfa.symbols:
-        curr_symbol_matrix = dok_matrix((len(nfa.states), len(nfa.states)), dtype=bool)
+        curr_symbol_matrix = matrix_type((len(nfa.states), len(nfa.states)), dtype=bool)
         for state_from, transitions in nfa_dict.items():
             # States that can be reached from the state_from in one step.
             states_to = set()
@@ -75,7 +85,9 @@ def sparse_matrix_to_nfa(sparse_matrix: SparseMatrix) -> NFA:
 
 
 def intersect(
-    sparse_matrix1: SparseMatrix, sparse_matrix2: SparseMatrix
+    sparse_matrix1: SparseMatrix,
+    sparse_matrix2: SparseMatrix,
+    matrix_type: Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix] = dok_matrix,
 ) -> SparseMatrix:
     symbols = sparse_matrix1.matrix.keys() & sparse_matrix2.matrix.keys()
 
@@ -101,9 +113,17 @@ def intersect(
             ):
                 final_states.add(state)
 
+    formats = {
+        lil_matrix: "lil",
+        dok_matrix: "dok",
+        csr_matrix: "csr",
+        csc_matrix: "csc",
+    }
     for symbol in symbols:
         matrix[symbol] = kron(
-            sparse_matrix1.matrix[symbol], sparse_matrix2.matrix[symbol], format="dok"
+            sparse_matrix1.matrix[symbol],
+            sparse_matrix2.matrix[symbol],
+            format=formats[matrix_type],
         )
 
     inversed_numerated_states = numerated_states
@@ -117,9 +137,10 @@ def create_front(
     graph_smatrix: SparseMatrix,
     regex_smatrix: SparseMatrix,
     numerated_start_states: Dict,
-) -> dok_matrix:
-    front_row = dok_matrix((1, len(graph_smatrix.numerated_states)), dtype=bool)
-    front = dok_matrix(
+    matrix_type=dok_matrix,
+) -> Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix]:
+    front_row = matrix_type((1, len(graph_smatrix.numerated_states)), dtype=bool)
+    front = matrix_type(
         (
             len(regex_smatrix.numerated_states),
             len(graph_smatrix.numerated_states) + len(regex_smatrix.numerated_states),
@@ -138,8 +159,12 @@ def create_front(
     return front
 
 
-def upd_front(regex_smatrix: SparseMatrix, front: dok_matrix) -> dok_matrix:
-    upd_front = dok_matrix(front.shape, dtype=bool)
+def upd_front(
+    regex_smatrix: SparseMatrix,
+    front: Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix],
+    matrix_type: Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix] = dok_matrix,
+) -> Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix]:
+    upd_front = matrix_type(front.shape, dtype=bool)
     states_count = len(regex_smatrix.numerated_states)
     for i, j in zip(*front.nonzero()):
         if j < states_count and front[i, states_count:].count_nonzero() > 0:
@@ -154,6 +179,7 @@ def bfs(
     graph_smatrix: SparseMatrix,
     regex_smatrix: SparseMatrix,
     foreach_start_node: bool = False,
+    matrix_type: Union[lil_matrix, dok_matrix, csr_matrix, csc_matrix] = dok_matrix,
 ) -> set:
     if not graph_smatrix.start_states:
         return set()
@@ -163,27 +189,29 @@ def bfs(
     if foreach_start_node:
         front = vstack(
             [
-                create_front(graph_smatrix, regex_smatrix, {i})
+                create_front(graph_smatrix, regex_smatrix, {i}, matrix_type)
                 for i in numerated_start_states
             ]
         )
     else:
-        front = create_front(graph_smatrix, regex_smatrix, numerated_start_states)
+        front = create_front(
+            graph_smatrix, regex_smatrix, numerated_start_states, matrix_type
+        )
 
     direct_sum = dict()
     for i in set(graph_smatrix.matrix.keys()).intersection(
         set(regex_smatrix.matrix.keys())
     ):
-        direct_sum[i] = dok_matrix(
+        direct_sum[i] = matrix_type(
             block_diag((regex_smatrix.matrix[i], graph_smatrix.matrix[i]))
         )
 
-    attended = dok_matrix(front.shape, dtype=bool)
+    attended = matrix_type(front.shape, dtype=bool)
     while True:
         saved_attended = attended.copy()
         for ds_matrix in direct_sum.values():
             next_front = attended @ ds_matrix if front is None else front @ ds_matrix
-            attended += upd_front(regex_smatrix, next_front)
+            attended += upd_front(regex_smatrix, next_front, matrix_type)
         if saved_attended.count_nonzero() == attended.count_nonzero():
             break
         front = None
